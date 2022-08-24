@@ -1,34 +1,15 @@
-const http = require("http");
-const fs = require("fs");
+const express = require("express");
+const app = express(); // создаем приложение
+const port = 3000;
 
-let count = 0;
+app.get("/", (req, res) => {
+	res.send("Hello world")
+})
 
-const readFile = (path) => {
-	return new Promise ((resolve, reject) => {
-		fs.readFile(path, (err, data) => {
-			if(err) reject(err)
-			else resolve(data);
-		})
-	})
-}
+app.get("/home", (req, res) => {
+	res.send('Hello home')
+})
 
-const index = http.createServer(async (req, res) => {
-	count++
-
-	switch (req.url) {
-		case '/students':
-			res.write("Students")
-			res.end();
-			break
-		case "/home":
-			const data = await readFile("pages/home.html");
-			res.write(data);
-			res.end();
-			break
-		default:
-			res.write('404 Not Found');
-			res.end();
-	}
-});
-
-index.listen(3003);
+app.listen(port, () => {
+	console.log(`Example ${port}`)
+})
