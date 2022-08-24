@@ -12,7 +12,7 @@ const readFile = (path) => {
 	})
 }
 
-const server = http.createServer(async (req, res) => {
+const index = http.createServer(async (req, res) => {
 	count++
 
 	switch (req.url) {
@@ -31,6 +31,4 @@ const server = http.createServer(async (req, res) => {
 	}
 });
 
-fetch("http://localhost:3003/home")
-
-server.listen(3003);
+index.listen(3003);

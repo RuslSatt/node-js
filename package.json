@@ -1,0 +1,8 @@
+{
+  "name": "node-js",
+  "version": "1.0.0",
+  "main": "\\",
+  "repository": "https://github.com/RuslSatt/node-js.git",
+  "author": "Ruslan Sattarov <r8sattarov@mail.ru>",
+  "license": "MIT"
+}
