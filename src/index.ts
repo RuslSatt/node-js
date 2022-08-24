@@ -1,4 +1,4 @@
-const express = require("express");
+import express from "express";
 const app = express(); // создаем приложение
 const port = 3000;
 
@@ -7,7 +7,11 @@ app.get("/", (req, res) => {
 })
 
 app.get("/home", (req, res) => {
-	res.send('Hello home')
+	res.send("Hello home")
+})
+
+app.post("/home", (req, res) => {
+	res.send("Post home")
 })
 
 app.listen(port, () => {
