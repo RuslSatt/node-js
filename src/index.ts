@@ -5,6 +5,15 @@ const port = 3000;
 const jsonBodyMiddleware = express.json();
 app.use(jsonBodyMiddleware);
 
+const HTTP_STATUSES = {
+    OK: 200,
+    CREATED: 201,
+    NO_CONTENT: 204,
+
+    BAD_REQUEST: 400,
+    NOT_FOUND_ERR: 404,
+}
+
 const db = {
     courses: [
         {id: 1, title: "front-end"},
@@ -32,7 +41,7 @@ app.get("/courses", (req, res) => {
 
 app.get("/courses/:id", (req, res) => {
     const foundCourse = db.courses.find(elem => elem.id === +req.params.id);
-    foundCourse ? res.json(foundCourse) : res.send(404);
+    foundCourse ? res.json(foundCourse) : res.send(HTTP_STATUSES.NOT_FOUND_ERR);
 })
 
 app.post('/courses', (req, res) => {
@@ -42,9 +51,9 @@ app.post('/courses', (req, res) => {
             title: req.body.title,
         }
         db.courses.push(newCourse);
-        res.status(201).json(newCourse);
+        res.status(HTTP_STATUSES.CREATED).json(newCourse);
     } else {
-        res.send(400);
+        res.send(HTTP_STATUSES.BAD_REQUEST);
     }
 })
 
@@ -52,9 +61,9 @@ app.delete("/courses/:id", (req, res) => {
     const deleteCourse = db.courses.find(item => item.id === +req.params.id);
     if(deleteCourse) {
         db.courses = db.courses.filter(item => item.id !== +req.params.id)
-        res.send(204);
+        res.send(HTTP_STATUSES.NO_CONTENT);
     } else {
-        res.send(404);
+        res.send(HTTP_STATUSES.NOT_FOUND_ERR);
     }
 })
 
@@ -65,10 +74,10 @@ app.put("/courses/:id", (req, res) => {
             foundCourse.title = req.body.title
             res.send(foundCourse)
         } else {
-            res.send(404);
+            res.send(HTTP_STATUSES.NOT_FOUND_ERR);
         }
     } else {
-        res.send(400);
+        res.send(HTTP_STATUSES.BAD_REQUEST);
     }
 })
 
