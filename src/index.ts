@@ -62,6 +62,7 @@ app.put("/courses/:id", (req, res) => {
         const foundCourse = db.courses.find(elem => elem.id === +req.params.id);
         if(foundCourse) {
             foundCourse.title = req.body.title
+            res.sendStatus(HTTP_STATUSES.NO_CONTENT);
         } else {
             res.sendStatus(HTTP_STATUSES.NOT_FOUND_ERR);
         }
