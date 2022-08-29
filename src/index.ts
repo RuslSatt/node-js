@@ -1,11 +1,11 @@
 import express from "express";
 
-const app = express(); // создаем приложение
+export const app = express(); // создаем приложение
 const port = 3000;
 const jsonBodyMiddleware = express.json();
 app.use(jsonBodyMiddleware);
 
-const HTTP_STATUSES = {
+export const HTTP_STATUSES = {
     OK: 200,
     CREATED: 201,
     NO_CONTENT: 204,
@@ -41,7 +41,7 @@ app.get("/courses", (req, res) => {
 
 app.get("/courses/:id", (req, res) => {
     const foundCourse = db.courses.find(elem => elem.id === +req.params.id);
-    foundCourse ? res.json(foundCourse) : res.send(HTTP_STATUSES.NOT_FOUND_ERR);
+    foundCourse ? res.json(foundCourse) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_ERR);
 })
 
 app.post('/courses', (req, res) => {
@@ -53,17 +53,7 @@ app.post('/courses', (req, res) => {
         db.courses.push(newCourse);
         res.status(HTTP_STATUSES.CREATED).json(newCourse);
     } else {
-        res.send(HTTP_STATUSES.BAD_REQUEST);
-    }
-})
-
-app.delete("/courses/:id", (req, res) => {
-    const deleteCourse = db.courses.find(item => item.id === +req.params.id);
-    if(deleteCourse) {
-        db.courses = db.courses.filter(item => item.id !== +req.params.id)
-        res.send(HTTP_STATUSES.NO_CONTENT);
-    } else {
-        res.send(HTTP_STATUSES.NOT_FOUND_ERR);
+        res.sendStatus(HTTP_STATUSES.BAD_REQUEST);
     }
 })
 
@@ -72,13 +62,27 @@ app.put("/courses/:id", (req, res) => {
         const foundCourse = db.courses.find(elem => elem.id === +req.params.id);
         if(foundCourse) {
             foundCourse.title = req.body.title
-            res.send(foundCourse)
         } else {
-            res.send(HTTP_STATUSES.NOT_FOUND_ERR);
+            res.sendStatus(HTTP_STATUSES.NOT_FOUND_ERR);
         }
     } else {
-        res.send(HTTP_STATUSES.BAD_REQUEST);
+        res.sendStatus(HTTP_STATUSES.BAD_REQUEST);
     }
+})
+
+app.delete("/courses/:id", (req, res) => {
+    const deleteCourse = db.courses.find(item => item.id === +req.params.id);
+    if(deleteCourse) {
+        db.courses = db.courses.filter(item => item.id !== +req.params.id)
+        res.sendStatus(HTTP_STATUSES.NO_CONTENT);
+    } else {
+        res.sendStatus(HTTP_STATUSES.NOT_FOUND_ERR);
+    }
+})
+
+app.delete('/__test__/data', (req, res) => {
+    db.courses = [];
+    res.sendStatus(HTTP_STATUSES.NO_CONTENT);
 })
 
 app.listen(port, () => {
