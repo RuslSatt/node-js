@@ -1,4 +1,5 @@
-import express from "express";
+import express, {Request, Response} from "express";
+import {RequestBody, RequestParams, RequestParamsBody, RequestQuery} from "./types";
 
 export const app = express(); // создаем приложение
 const port = 3000;
@@ -14,7 +15,12 @@ export const HTTP_STATUSES = {
     NOT_FOUND_ERR: 404,
 }
 
-const db = {
+type CourseType = {
+    id: number,
+    title: string,
+}
+
+const db: {courses: CourseType[]} = {
     courses: [
         {id: 1, title: "front-end"},
         {id: 2, title: "back-end"},
@@ -31,21 +37,21 @@ app.get("/home", (req, res) => {
     res.send("Hello home")
 })
 
-app.get("/courses", (req, res) => {
+app.get("/courses", (req: RequestQuery<{ title: string }>, res: Response<CourseType[]>) => {
     let foundCourses = db.courses;
     if (req.query.title) {
-        foundCourses = foundCourses.filter(elem => elem.title.indexOf(req.query.title as string) !== -1);
+        foundCourses = foundCourses.filter(elem => elem.title.indexOf(req.query.title) !== -1);
     }
     res.json(foundCourses);
 })
 
-app.get("/courses/:id", (req, res) => {
+app.get("/courses/:id", (req: RequestParams<{id: string}>, res: Response<CourseType>) => {
     const foundCourse = db.courses.find(elem => elem.id === +req.params.id);
     foundCourse ? res.json(foundCourse) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_ERR);
 })
 
-app.post('/courses', (req, res) => {
-    if(req.body.title) {
+app.post('/courses', (req: RequestBody<{title: string}>, res: Response<CourseType>) => {
+    if (req.body.title) {
         const newCourse = {
             id: +(new Date()),
             title: req.body.title,
@@ -57,10 +63,10 @@ app.post('/courses', (req, res) => {
     }
 })
 
-app.put("/courses/:id", (req, res) => {
-    if(req.body.title) {
+app.put("/courses/:id", (req: RequestParamsBody<{id: string}, {title: string}>, res) => {
+    if (req.body.title) {
         const foundCourse = db.courses.find(elem => elem.id === +req.params.id);
-        if(foundCourse) {
+        if (foundCourse) {
             foundCourse.title = req.body.title
             res.sendStatus(HTTP_STATUSES.NO_CONTENT);
         } else {
@@ -71,9 +77,9 @@ app.put("/courses/:id", (req, res) => {
     }
 })
 
-app.delete("/courses/:id", (req, res) => {
+app.delete("/courses/:id", (req: RequestParams<{id: string}>, res) => {
     const deleteCourse = db.courses.find(item => item.id === +req.params.id);
-    if(deleteCourse) {
+    if (deleteCourse) {
         db.courses = db.courses.filter(item => item.id !== +req.params.id)
         res.sendStatus(HTTP_STATUSES.NO_CONTENT);
     } else {
