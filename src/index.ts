@@ -1,5 +1,6 @@
 import express, {Request, Response} from "express";
 import {RequestBody, RequestParams, RequestParamsBody, RequestQuery} from "./types";
+import {CourseCreateModel, CourseQueryModel, CourseUpdateModel} from "./models/models";
 
 export const app = express(); // создаем приложение
 const port = 3000;
@@ -29,15 +30,7 @@ const db: {courses: CourseType[]} = {
     ]
 }
 
-app.get("/", (req, res) => {
-    res.send("Hello world")
-})
-
-app.get("/home", (req, res) => {
-    res.send("Hello home")
-})
-
-app.get("/courses", (req: RequestQuery<{ title: string }>, res: Response<CourseType[]>) => {
+app.get("/courses", (req: RequestQuery<CourseQueryModel>, res: Response<CourseType[]>) => {
     let foundCourses = db.courses;
     if (req.query.title) {
         foundCourses = foundCourses.filter(elem => elem.title.indexOf(req.query.title) !== -1);
@@ -50,7 +43,7 @@ app.get("/courses/:id", (req: RequestParams<{id: string}>, res: Response<CourseT
     foundCourse ? res.json(foundCourse) : res.sendStatus(HTTP_STATUSES.NOT_FOUND_ERR);
 })
 
-app.post('/courses', (req: RequestBody<{title: string}>, res: Response<CourseType>) => {
+app.post('/courses', (req: RequestBody<CourseCreateModel>, res: Response<CourseType>) => {
     if (req.body.title) {
         const newCourse = {
             id: +(new Date()),
@@ -63,7 +56,7 @@ app.post('/courses', (req: RequestBody<{title: string}>, res: Response<CourseTyp
     }
 })
 
-app.put("/courses/:id", (req: RequestParamsBody<{id: string}, {title: string}>, res) => {
+app.put("/courses/:id", (req: RequestParamsBody<{id: string}, CourseUpdateModel>, res) => {
     if (req.body.title) {
         const foundCourse = db.courses.find(elem => elem.id === +req.params.id);
         if (foundCourse) {
