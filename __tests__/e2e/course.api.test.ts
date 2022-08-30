@@ -1,5 +1,6 @@
 import request from "supertest";
 import {app, HTTP_STATUSES} from "../../src";
+import {CourseCreateModel, CourseUpdateModel} from "../../src/models/models";
 
 describe('/index.ts', () => {
 
@@ -37,18 +38,18 @@ describe('/index.ts', () => {
     })
 
     it('should create course with correct data', async () => {
+        const data: CourseCreateModel = {title: 'new course'}
+
         const response = await request(app)
             .post('/courses')
-            .send({
-                title: 'new course'
-            })
+            .send(data)
             .expect(HTTP_STATUSES.CREATED);
 
         createdCourse = response.body;
 
         expect(createdCourse).toEqual({
             id: expect.any(Number),
-            title: "new course",
+            title: data.title,
         })
 
         await request(app)
@@ -57,9 +58,11 @@ describe('/index.ts', () => {
     })
 
     it('should not update course if title does not have', async () => {
+        const data: CourseUpdateModel = {title: ''}
+
         await request(app)
             .put('/courses/' + createdCourse.id)
-            .send({title: ''})
+            .send(data)
             .expect(HTTP_STATUSES.BAD_REQUEST)
 
         await request(app)
@@ -68,21 +71,25 @@ describe('/index.ts', () => {
     })
 
     it('should not update not exist', async () => {
+        const data: CourseUpdateModel = {title: 'Update new course'}
+
         await request(app)
             .put('/courses/' + -345)
-            .send({title: 'Update new course'})
+            .send(data)
             .expect(HTTP_STATUSES.NOT_FOUND_ERR)
     })
 
     it('should update the course if data is correct', async () => {
+        const data: CourseUpdateModel = {title: 'Update new course'}
+
         await request(app)
             .put(`/courses/` + createdCourse.id)
-            .send({title: 'update new course'})
+            .send(data)
             .expect(HTTP_STATUSES.NO_CONTENT)
 
         await request(app)
             .get('/courses/' + createdCourse.id)
-            .expect(HTTP_STATUSES.OK, {...createdCourse, title: 'update new course'})
+            .expect(HTTP_STATUSES.OK, {...createdCourse, title: 'Update new course'})
     })
 
     it('should delete the course if data is correct', async () => {
